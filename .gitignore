@@ -36,3 +36,4 @@ node_modules
 .DS_store
 #IDE stuff
 .idea
+tuto/
