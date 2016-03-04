@@ -63902,7 +63902,7 @@ Phaser.Time = function (game) {
     * While this value is in milliseconds and can be used to compute time deltas,
     * it must must _not_ be used with `Date.now()` as it may not use the same epoch / starting reference.
     *
-    * The source may either be from a high-res source (eg. if RAF is available) or the standard Date.now;
+    * The source may either be from a high-assets source (eg. if RAF is available) or the standard Date.now;
     * the value can only be relied upon within a particular game instance.
     *
     * @property {number} now

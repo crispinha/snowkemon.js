@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Snowkemon.js</title>
+    <script type="application/javascript" src="phaser.js"></script>
+    <style type="text/css">
+        body {
+            text-align: center;
+            background-color: darkgray;
+        }
+    </style>
+</head>
+<body>
+<script>
+    var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game', {preload: preload, create: create, update: update})
+
+    function preload() {
+        game.load.image('background', 'assets/background.png');
+        game.load.image('good', 'assets/good_snow.png');
+        game.load.image('bad', 'assets/bad_snow.png');
+        game.load.image('box', 'assets/text_box.png');
+    }
+    function create() {
+        game.add.sprite(0, 0, 'background');
+        var player = game.add.sprite(79, 183, 'good');
+        var enemy = game.add.sprite(675, 25, 'bad');
+        var textArea = game.add.sprite(150, 435, 'box');
+        player.inputEnabled = true;
+        player.events.onInputDown.add(function() {movePlayer(player)}, this);
+    }
+
+    function update() {
+    }
+
+    function movePlayer(player) {
+        game.add.tween(player).to({y: player.position.y - 100}, 750, Phaser.Easing.Bounce.Out, true)
+                .onComplete.add(function () {game.add.tween(player).to({y: 183}, 750, Phaser.Easing.Bounce.Out, true)}, this);
+    }
+</script>
+<div id="game"></div>
+</body>
+</html>
