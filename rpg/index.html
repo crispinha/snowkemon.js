@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Snowkemon.js</title>
+    <link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
     <script type="application/javascript" src="phaser.js"></script>
     <style type="text/css">
         body {
             text-align: center;
             background-color: darkgray;
+            font-family: 'VT323', normal;
         }
     </style>
 </head>
@@ -22,12 +24,18 @@
         game.load.image('box', 'assets/text_box.png');
     }
     function create() {
+        //sprites
         game.add.sprite(0, 0, 'background');
         var player = game.add.sprite(79, 183, 'good');
         var enemy = game.add.sprite(675, 25, 'bad');
         var textArea = game.add.sprite(150, 435, 'box');
-        player.inputEnabled = true;
-        player.events.onInputDown.add(function() {movePlayer(player)}, this);
+        var messageBox = game.add.text(165, 450, "", {font: 'VT323',fontSize:'42px', fill:"#000"});
+        //delay
+        var delay = 20;
+        //introduction
+        updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, delay, function() {moveEnemy(enemy)});
+        //debug stuff
+
     }
 
     function update() {
@@ -37,7 +45,36 @@
         game.add.tween(player).to({y: player.position.y - 100}, 750, Phaser.Easing.Bounce.Out, true)
                 .onComplete.add(function () {game.add.tween(player).to({y: 183}, 750, Phaser.Easing.Bounce.Out, true)}, this);
     }
+    function moveEnemy(enemy) {
+        game.add.tween(enemy).to({y: enemy.position.y + 100}, 750, Phaser.Easing.Bounce.Out, true)
+                .onComplete.add(function () {game.add.tween(enemy).to({y: 25}, 750, Phaser.Easing.Bounce.Out, true)}, this);
+    }
+    function updateText(input, textArea, delay, finished) {
+        clearText(textArea);
+        var i = 0;
+        line = input.split("");
+        game.time.events.repeat(delay, line.length, function() {textArea.text = textArea.text.concat(line[i] + "");i++;}, this);
+        game.time.events.onComplete.add(function(){finished()});
+    }
+    function appendText(input, textArea, delay, finished) {
+        textArea.text = textArea.text + ' ';
+        var i = 0;
+        line = input.split("");
+        game.time.events.repeat(delay, line.length, function() {textArea.text = textArea.text.concat(line[i] + "");i++;}, this);
+        game.time.events.onComplete.add(function(){finished()});
+    }
+    function clearText(textArea) {
+        textArea.text = '';
+    }
 </script>
 <div id="game"></div>
+
+Who Did This<br>
+Character Art by Unicode<br>
+Clever Programming Stuff by Phaser<br>
+Dumb Programming Stuff by Crispin<br>
+Fonts by Peter Hull<br>
+Gameplay by Pokèmon
+
 </body>
 </html>
