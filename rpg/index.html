@@ -5,11 +5,23 @@
     <title>Snowkemon.js</title>
     <link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
     <script type="application/javascript" src="phaser.js"></script>
+    <script type="application/javascript">
+        var appendDebug = function(text) {
+            document.getElementById('debug').value = document.getElementById('debug').value + "\n" + text;
+        }
+    </script>
     <style type="text/css">
         body {
             text-align: center;
             background-color: darkgray;
             font-family: 'VT323', normal;
+        }
+        textarea{
+            height: 97%;
+            position: absolute;
+            top: 1%;
+            left: 72%;
+            width: 60%;
         }
     </style>
 </head>
@@ -22,20 +34,38 @@
         game.load.image('good', 'assets/good_snow.png');
         game.load.image('bad', 'assets/bad_snow.png');
         game.load.image('box', 'assets/text_box.png');
+        game.load.image('attack', 'assets/buttons/atk.png');
+        game.load.image('heal', 'assets/buttons/fix.png');
+        game.load.image('run', 'assets/buttons/run.png');
+        game.load.image('quit', 'assets/buttons/qut.png');
+        game.load.image('snow', 'assets/buttons/snw.png');
     }
     function create() {
-        //sprites
-        game.add.sprite(0, 0, 'background');
-        var player = game.add.sprite(79, 183, 'good');
-        var enemy = game.add.sprite(675, 25, 'bad');
+        //game setup stuff
+        game.stage.backgroundColor = "#FFFFFF";
         var textArea = game.add.sprite(150, 435, 'box');
         var messageBox = game.add.text(165, 450, "", {font: 'VT323',fontSize:'42px', fill:"#000"});
+        var attack = game.add.sprite(40, 450, 'attack');
+        var heal = game.add.sprite(40, 675, 'heal');
+        var run = game.add.sprite(900, 450, 'run');
+        var quit = game.add.sprite(900, 675, 'quit');
+        attack.inputEnabled = true;
+        heal.inputEnabled = true;
+        quit.inputEnabled = true;
+        run.inputEnabled = true;
+        //characters
+        var player = game.add.sprite(79, 183, 'good');
+        var enemy = game.add.sprite(675, 25, 'bad');
         //delay
         var delay = 20;
         //introduction
         updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, delay, function() {moveEnemy(enemy)});
         //debug stuff
-
+        document.getElementById('debug').value = 'debug activated';
+        attack.events.onInputDown.add(function(){appendDebug("atk failed")}, this);
+        heal.events.onInputDown.add(function(){appendDebug("heal failed")}, this);
+        run.events.onInputDown.add(function(){appendDebug("run failed")}, this);
+        quit.events.onInputDown.add(function(){appendDebug("nah")}, this);
     }
 
     function update() {
@@ -68,7 +98,7 @@
     }
 </script>
 <div id="game"></div>
-
+<textarea id="debug" readonly></textarea>
 Who Did This<br>
 Character Art by Unicode<br>
 Clever Programming Stuff by Phaser<br>
