@@ -9,6 +9,9 @@
         var appendDebug = function(text) {
             document.getElementById('debug').value = document.getElementById('debug').value + "\n" + text;
         }
+        function getRandomFloat(min, max) {
+            return Math.random() * (max - min + 1) + min;
+        }
     </script>
     <style type="text/css">
         body {
@@ -30,7 +33,6 @@
     var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game', {preload: preload, create: create, update: update})
 
     function preload() {
-        game.load.image('background', 'assets/background.png');
         game.load.image('good', 'assets/good_snow.png');
         game.load.image('bad', 'assets/bad_snow.png');
         game.load.image('box', 'assets/text_box.png');
@@ -55,14 +57,16 @@
         run.inputEnabled = true;
         //characters
         var player = game.add.sprite(79, 183, 'good');
+        player.stats = {name: 'Pikasnow', health: 100, attack: 7, defense: 5, heal: 3, speed: 8};
         var enemy = game.add.sprite(675, 25, 'bad');
+        enemy.stats = {name: 'Snowizard', health: 100, attack: 4, defense: 8, heal: 6, speed: 5};
         //delay
         var delay = 20;
         //introduction
         updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, delay, function() {moveEnemy(enemy)});
         //debug stuff
         document.getElementById('debug').value = 'debug activated';
-        attack.events.onInputDown.add(function(){appendDebug("atk failed")}, this);
+        attack.events.onInputDown.add(function(){appendDebug('You attack for ' + Math.floor(getRandomFloat(0.7, 1.3) * player.stats.attack)  + ' damage.')}, this);
         heal.events.onInputDown.add(function(){appendDebug("heal failed")}, this);
         run.events.onInputDown.add(function(){appendDebug("run failed")}, this);
         quit.events.onInputDown.add(function(){appendDebug("nah")}, this);
@@ -81,13 +85,6 @@
     }
     function updateText(input, textArea, delay, finished) {
         clearText(textArea);
-        var i = 0;
-        line = input.split("");
-        game.time.events.repeat(delay, line.length, function() {textArea.text = textArea.text.concat(line[i] + "");i++;}, this);
-        game.time.events.onComplete.add(function(){finished()});
-    }
-    function appendText(input, textArea, delay, finished) {
-        textArea.text = textArea.text + ' ';
         var i = 0;
         line = input.split("");
         game.time.events.repeat(delay, line.length, function() {textArea.text = textArea.text.concat(line[i] + "");i++;}, this);
