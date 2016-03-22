@@ -1,12 +1,130 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Evoloution Game</title>
+    <title>Snowkemon.js</title>
+    <link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
+    <script type="application/javascript" src="phaser.js"></script>
+    <script type="application/javascript">
+        var appendDebug = function(text) {
+            document.getElementById('debug').value = document.getElementById('debug').value + "\n" + text;
+        }
+        function getRandomFloat(min, max) {
+            return Math.random() * (max - min + 1) + min;
+        }
+    </script>
+    <style type="text/css">
+        body {
+            text-align: center;
+            background-color: darkgray;
+            font-family: 'VT323', normal;
+        }
+        textarea{
+            height: 97%;
+            position: absolute;
+            top: 1%;
+            left: 72%;
+            width: 60%;
+        }
+    </style>
 </head>
 <body>
-<a href="/first">First Tutorial</a><br>
-<a href="/rpg">Snowkemon.js</a><br>
-<a href="/text.html">Text Demo</a><br>
+<script>
+    var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game', {preload: preload, create: create, update: update});
+    var textWaiting = false;
+
+    function preload() {
+        game.load.image('good', 'assets/good_snow.png');
+        game.load.image('bad', 'assets/bad_snow.png');
+        game.load.image('box', 'assets/text_box.png');
+        game.load.image('attack', 'assets/buttons/atk.png');
+        game.load.image('heal', 'assets/buttons/fix.png');
+        game.load.image('run', 'assets/buttons/run.png');
+        game.load.image('quit', 'assets/buttons/qut.png');
+        game.load.image('snow', 'assets/buttons/snw.png');
+    }
+
+
+    function create() {
+        //replace soon
+        function doStart() {updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {moveEnemy(enemy)});};
+
+        //game setup stuff
+        game.stage.backgroundColor = "#FFFFFF";
+        var textArea = game.add.sprite(150, 435, 'box');
+        var messageBox = game.add.text(165, 450, "", {font: 'VT323',fontSize:'42px', fill:"#000"});
+        var attack = game.add.sprite(40, 450, 'attack');
+        var heal = game.add.sprite(40, 675, 'heal');
+        var run = game.add.sprite(900, 450, 'run');
+        var quit = game.add.sprite(900, 675, 'quit');
+        attack.inputEnabled = true;
+        heal.inputEnabled = true;
+        quit.inputEnabled = true;
+        run.inputEnabled = true;
+        //characters
+        var player = game.add.sprite(79, 183, 'good');
+        player.stats = {name: 'Pikasnow', health: 100, attack: 7, defense: 5, heal: 3, speed: 8};
+        var enemy = game.add.sprite(675, 25, 'bad');
+        enemy.stats = {name: 'Snowizard', health: 100, attack: 4, defense: 8, heal: 6, speed: 5};
+        //delay
+        var delay = 20;
+        //introduction
+        //replace soon
+        doStart();
+        //debug stuff
+        document.getElementById('debug').value = 'debug activated';
+        attack.events.onInputDown.add(function(){appendDebug(
+                'You attack for ' + Math.floor(getRandomFloat(0.7, 1.3) * player.stats.attack)  + ' damage.')}, this);
+        heal.events.onInputDown.add(function(){appendDebug('why is it doing this');updateText("heal failed", messageBox)}, this);
+        run.events.onInputDown.add(function(){doStart()}, this);
+        quit.events.onInputDown.add(function(){appendDebug("nah")}, this);
+    }
+
+    function update() {
+    }
+
+    function movePlayer(player) {
+        game.add.tween(player).to({y: player.position.y - 100}, 750, Phaser.Easing.Bounce.Out, true)
+                .onComplete.add(function () {game.add.tween(player).to({y: 183}, 750, Phaser.Easing.Bounce.Out, true)}, this);
+    }
+    function moveEnemy(enemy) {
+        game.add.tween(enemy).to({y: enemy.position.y + 100}, 750, Phaser.Easing.Bounce.Out, true)
+                .onComplete.add(function () {game.add.tween(enemy).to({y: 25}, 750, Phaser.Easing.Bounce.Out, true);console.log('enemy moved');}, this);
+    }
+    function updateText(input, textArea, callback, resetText) {
+        icallback = null
+        icallback = callback || function(){return null;};
+        resetText = resetText || true;
+        if (!textWaiting) {
+            textWaiting = true;
+            if (resetText) {clearText(textArea)};
+            var i = 0;
+            line = input.split("");
+            game.time.events.repeat(20, line.length, function () {
+                textArea.text = textArea.text.concat(line[i] + "");
+                i++;
+            }, this);
+            game.time.events.onComplete.add(function () {
+                icallback();
+                textWaiting = false;
+            });
+        }
+    };
+    function clearText(textArea) {
+        textArea.text = '';
+    }
+</script>
+<div id="game"></div>
+<br>
+<button onclick="game.world.removeAll();create();document.getElementById('debug').innerHTML = 'Scratch that.\n'">Restart</button>
+<br>
+<textarea id="debug" readonly></textarea>
+Who Did This<br>
+Character Art by Unicode<br>
+Clever Programming Stuff by Phaser<br>
+Dumb Programming Stuff by Crispin<br>
+Fonts by Peter Hull<br>
+Gameplay by Pokèmon
+
 </body>
 </html>
