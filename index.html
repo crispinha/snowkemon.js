@@ -30,8 +30,22 @@
 </head>
 <body>
 <script>
+    var hpList = [
+        '<██████████>',
+        '<█████████ >',
+        '<████████  >',
+        '<███████   >',
+        '<██████    >',
+        '<█████     >',
+        '<████      >',
+        '<███       >',
+        '<█         >',
+        '<          >'
+    ]
+    
     var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game', {preload: preload, create: create, update: update});
     var textWaiting = false;
+    var debugHidden = false;
 
     function preload() {
         game.load.image('good', 'assets/good_snow.png');
@@ -65,7 +79,10 @@
         var player = game.add.sprite(79, 183, 'good');
         player.stats = {name: 'Pikasnow', health: 100, attack: 7, defense: 5, heal: 3, speed: 8};
         var enemy = game.add.sprite(675, 25, 'bad');
-        enemy.stats = {name: 'Snowizard', health: 100, attack: 4, defense: 8, heal: 6, speed: 5};
+        enemy.stats = {name: 'Pr.Snowk', health: 100, attack: 4, defense: 8, heal: 6, speed: 5};
+        //hp
+        var playerHP = game.add.text(100, 100, player.stats.name + ' ' + hpList[0], {font: 'VT323',fontSize:'42px', fill:"#000"});
+        var enemyHP = game.add.text(140, 140, enemy.stats.name + ' ' + hpList[0], {font: 'VT323',fontSize:'42px', fill:"#000"});
         //delay
         var delay = 20;
         //introduction
@@ -124,6 +141,7 @@
 <div id="game"></div>
 <br>
 <button onclick="game.world.removeAll();create();document.getElementById('debug').innerHTML = 'Scratch that.\n'">Restart</button>
+<button onclick="if (debugHidden){document.getElementById('debug').style.display = 'none';debugHidden = true} else {document.getElementById('debug').style.display = 'block';debugHidden = false}" style="text-align: left">Show/hide debug</button>
 <br>
 <textarea id="debug" readonly></textarea>
 Who Did This<br>
