@@ -73,13 +73,20 @@
         doStart();
         //debug stuff
         document.getElementById('debug').value = 'debug activated';
-        attack.events.onInputDown.add(function(){appendDebug(
-                'You attack for ' + Math.floor(getRandomFloat(0.7, 1.3) * player.stats.attack)  + ' damage.')}, this);
-        heal.events.onInputDown.add(function(){appendDebug('why is it doing this');updateText("heal failed", messageBox)}, this);
-        run.events.onInputDown.add(function(){doStart()}, this);
-        quit.events.onInputDown.add(function(){appendDebug("nah")}, this);
+        attack.events.onInputDown.add(function(){doAttack(player, enemy, messageBox)});
+        heal.events.onInputDown.add(function(){doHeal(player, messageBox)}, this);
+        run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
+        quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
     }
 
+    function doAttack (self, target, messageBox) {
+        var damage = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.attack);
+        updateText('You attack for ' + damage + ' damage.', messageBox);
+    }
+    function doHeal (self, messageBox) {
+        var heal = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.heal);
+        updateText('You heal ' + heal + ' hp.', messageBox);
+    }
     function update() {
     }
 
