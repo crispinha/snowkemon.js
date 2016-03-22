@@ -47,7 +47,7 @@
 
     function create() {
         //replace soon
-        function doStart() {updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {console.log('callback of dostart');moveEnemy(enemy)});};
+        function doStart() {updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {moveEnemy(enemy)});};
 
         //game setup stuff
         game.stage.backgroundColor = "#FFFFFF";
@@ -91,31 +91,33 @@
         game.add.tween(enemy).to({y: enemy.position.y + 100}, 750, Phaser.Easing.Bounce.Out, true)
                 .onComplete.add(function () {game.add.tween(enemy).to({y: 25}, 750, Phaser.Easing.Bounce.Out, true);console.log('enemy moved');}, this);
     }
-    function updateText(input, textArea, callback) {
-        callback = callback || function(){return null;};
+    function updateText(input, textArea, callback, resetText) {
+        icallback = null
+        icallback = callback || function(){return null;};
+        resetText = resetText || true;
         if (!textWaiting) {
             textWaiting = true;
-            clearText(textArea);
+            if (resetText) {clearText(textArea)};
             var i = 0;
             line = input.split("");
-            var timer = game.time.events.repeat(20, line.length + 1, function () {
+            game.time.events.repeat(20, line.length, function () {
                 textArea.text = textArea.text.concat(line[i] + "");
                 i++;
             }, this);
             game.time.events.onComplete.add(function () {
-                callback();
-                console.log('onComplete');
-                game.time.events.add(20, function(){console.log('onComplete')}, this);
-//                textWaiting = false;
-//                callback = null;
-                });
+                icallback();
+                textWaiting = false;
+            });
         }
-    }
+    };
     function clearText(textArea) {
         textArea.text = '';
     }
 </script>
 <div id="game"></div>
+<br>
+<button onclick="game.world.removeAll();create();document.getElementById('debug').innerHTML = 'Scratch that.\n'">Restart</button>
+<br>
 <textarea id="debug" readonly></textarea>
 Who Did This<br>
 Character Art by Unicode<br>
