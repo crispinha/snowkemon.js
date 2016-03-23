@@ -8,7 +8,7 @@
     <script type="application/javascript" src="game.js"></script>
     <script type="application/javascript">
         var appendDebug = function(text) {
-            return null;
+            document.getElementById('debug').value = document.getElementById('debug').value + "\n" + text;
         }
         function getRandomFloat(min, max) {
             return Math.random() * (max - min + 1) + min;
@@ -33,7 +33,9 @@
 <div id="game"></div>
 <br>
 <button onclick="game.world.removeAll();create();document.getElementById('debug').innerHTML = 'Scratch that.\n'">Restart</button>
+<button onclick="if (debugHidden){document.getElementById('debug').style.display = 'none';debugHidden = true} else {document.getElementById('debug').style.display = 'block';debugHidden = false}" style="text-align: left">Show/hide debug</button>
 <br>
+<textarea id="debug" readonly></textarea>
 Who Did This<br>
 Character Art by Unicode<br>
 Clever Programming Stuff by Phaser<br>
