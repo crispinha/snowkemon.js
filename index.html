@@ -7,9 +7,10 @@
     <script type="application/javascript" src="phaser.min.js"></script>
     <script type="application/javascript" src="game.js"></script>
     <script type="application/javascript">
-        var appendDebug = function(text) {
+        //i do this because otherwise it crashes
+        var appendDebug = function() {
             return null;
-        }
+        };
         function getRandomFloat(min, max) {
             return Math.random() * (max - min + 1) + min;
         }

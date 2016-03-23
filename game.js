@@ -2,17 +2,18 @@
  * Created by crispin on 23/03/16.
  */
 var hpList = [
-	'<██████████>',
-	'<█████████ >',
-	'<████████  >',
-	'<███████   >',
-	'<██████    >',
-	'<█████     >',
-	'<████      >',
-	'<███       >',
+	'<   DEAD   >',
+	'<          >',
 	'<█         >',
-	'<          >'
-]
+	'<███       >',
+	'<████      >',
+	'<█████     >',
+	'<██████    >',
+	'<███████   >',
+	'<████████  >',
+	'<█████████ >',
+	'<██████████>'
+];
 
 var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game', {preload: preload, create: create, update: update});
 var textWaiting = false;
@@ -52,28 +53,34 @@ function create() {
 	var enemy = game.add.sprite(675, 25, 'bad');
 	enemy.stats = {name: 'Pr.Snowk', health: 100, attack: 4, defense: 8, heal: 6, speed: 5};
 	//hp
-	var playerHP = game.add.text(100, 100, player.stats.name + ' ' + hpList[0], {font: 'VT323',fontSize:'42px', fill:"#000"});
-	var enemyHP = game.add.text(140, 140, enemy.stats.name + ' ' + hpList[0], {font: 'VT323',fontSize:'42px', fill:"#000"});
+	var playerHP = game.add.text(300, 375, player.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
+	var enemyHP = game.add.text(250, 25, enemy.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
 	//delay
 	var delay = 20;
 	//introduction
 	//replace soon
 	doStart();
-	//debug stuff
-	appendDebug('debug activated');
-	attack.events.onInputDown.add(function(){doAttack(player, enemy, messageBox)});
+	//button commands
+	attack.events.onInputDown.add(function(){doAttack(player, enemy, messageBox, function(){movePlayer(player)})});
 	heal.events.onInputDown.add(function(){doHeal(player, messageBox)}, this);
 	run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
 	quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
+	//debug stuff
+	appendDebug('debug activated');
 }
 
-function doAttack (self, target, messageBox) {
+function doAttack (self, target, messageBox, callback) {
+	//if you have the time, make it do defense too
+	icallback = null;
+	icallback = callback || function(){return null;};
 	var damage = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.attack);
-	updateText('You attack for ' + damage + ' damage.', messageBox);
+	updateText(self.stats.name + ' attacks for ' + damage + ' damage.', messageBox, icallback);
 }
-function doHeal (self, messageBox) {
+function doHeal (self, messageBox, callback) {
+	icallback = null;
+	icallback = callback || function(){return null;};
 	var heal = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.heal);
-	updateText('You heal ' + heal + ' hp.', messageBox);
+	updateText(self.stats.name + ' heals ' + heal + ' hp.', messageBox, icallback);
 }
 function update() {
 }
@@ -87,14 +94,16 @@ function moveEnemy(enemy) {
 		.onComplete.add(function () {game.add.tween(enemy).to({y: 25}, 750, Phaser.Easing.Bounce.Out, true);appendDebug('enemy moved');}, this);
 }
 function updateText(input, textArea, callback, resetText) {
-	icallback = null
+	//don't touch the bullshit
+	//also this has to be implicitly declared or shit hits the fan
+	icallback = null;
 	icallback = callback || function(){return null;};
 	resetText = resetText || true;
 	if (!textWaiting) {
 		textWaiting = true;
-		if (resetText) {clearText(textArea)};
+		if (resetText) {textArea.text = ''};
 		var i = 0;
-		line = input.split("");
+		var line = input.split("");
 		game.time.events.repeat(20, line.length, function () {
 			textArea.text = textArea.text.concat(line[i] + "");
 			i++;
@@ -105,6 +114,3 @@ function updateText(input, textArea, callback, resetText) {
 		});
 	}
 };
-function clearText(textArea) {
-	textArea.text = '';
-}
