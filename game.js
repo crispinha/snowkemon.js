@@ -31,6 +31,7 @@ function preload() {
 
 
 function create() {
+
 	//replace soon
 	function doStart() {updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {moveEnemy(enemy)});};
 
@@ -60,41 +61,46 @@ function create() {
 	//replace soon
 	doStart();
 	//button commands
-	attack.events.onInputDown.add(function(){doAttack(player, enemy, messageBox, function(){movePlayer(player)})});
-	heal.events.onInputDown.add(function(){doHeal(player, messageBox)}, this);
-	run.events.onInputDown.add(function(){calculateHealthBars(player, enemy, playerHP, enemyHP)});
-	//run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
+	attack.events.onInputDown.add(function(){doAttack(player, enemy, messageBox, function(){movePlayer(player)}, [player, enemy, playerHP, enemyHP])}, this);
+	heal.events.onInputDown.add(function(){doHeal(player, messageBox, null, [player, enemy, playerHP, enemyHP])}, this);
+	run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
 	quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
 	//debug stuff
 	appendDebug('debug activated');
+
 }
 
-function doAttack (self, target, messageBox, callback) {
+function doAttack (self, target, messageBox, callback, chbArgs) {
 	//if you have the time, make it do defense too
 	icallback = null;
 	icallback = callback || function(){return null;};
 	var damage = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.attack);
 	target.stats.health = target.stats.health - damage;
-	updateText(self.stats.name + ' attacks for ' + damage + ' damage.\nThey are on ' + target.stats.health + ' health.', messageBox, icallback);
+	console.log(chbArgs);
+	calculateHealthBars.apply(this, chbArgs);
+	updateText(self.stats.name + ' attacks for ' + damage + ' damage.', messageBox, icallback);
 }
-function doHeal (self, messageBox, callback) {
+function doHeal (self, messageBox, callback, chbArgs) {
 	icallback = null;
 	icallback = callback || function(){return null;};
 	var heal = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.heal);
 	self.stats.health = self.stats.health + heal;
+	calculateHealthBars.apply(this, chbArgs);
 	updateText(self.stats.name + ' heals ' + heal + ' hp.', messageBox, icallback);
 }
-function calculateHealthBars(player, enemy, playerText, enemyText) {
+
+function calculateHealthBars(player, enemy, playerHP, enemyHP) {
 	playerHealthRounded = (player.stats.health / 10).toFixed(0);
 	enemyHealthRounded = (enemy.stats.health / 10).toFixed(0);
-	//if health is equal to or greater than max health, use full bar, else use rounded bar
-	if (player.stats.health >= player.stats.maxHealth) {playerText.text = player.stats.name + ' ' + hpList[10]}
-		else {playerText.text = player.stats.name + ' ' + hpList[playerHealthRounded]};
-	if (enemy.stats.health >= enemy.stats.maxHealth) {enemyText.text = enemy.stats.name + ' ' + hpList[10]}
-		else {enemyText.text = enemy.stats.name + ' ' + hpList[enemyHealthRounded]};
+	//if health is equal to or greater than max health, use full bar, else if health is equal to or less than 0 use dead bar, else use rounded bar
+	if (player.stats.health >= player.stats.maxHealth) {playerHP.text = player.stats.name + ' ' + hpList[10]}
+	else if (player.stats.health <= 0) {playerHP.text = player.stats.name + ' ' + hpList[0]}
+	else{playerHP.text = player.stats.name + ' ' + hpList[playerHealthRounded]};
+	if (enemy.stats.health >= enemy.stats.maxHealth) {enemyHP.text = enemy.stats.name + ' ' + hpList[10]}
+	else if (enemy.stats.health <= 0) {enemyHP.text = enemy.stats.name + ' ' + hpList[0]}
+	else {enemyHP.text = enemy.stats.name + ' ' + hpList[enemyHealthRounded]};
 
 }
-
 function update() {
 }
 
