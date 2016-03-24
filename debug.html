@@ -8,7 +8,7 @@
     <script type="application/javascript" src="game.js"></script>
     <script type="application/javascript">
         var appendDebug = function(text) {
-            document.getElementById('debug').value = document.getElementById('debug').value + "\n" + text;
+            document.getElementById('debug').value = document.getElementById('debug').value + text + '\n';
         }
         function getRandomFloat(min, max) {
             return Math.random() * (max - min + 1) + min;

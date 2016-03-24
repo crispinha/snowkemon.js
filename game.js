@@ -17,7 +17,6 @@ var hpList = [
 
 var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game', {preload: preload, create: create, update: update});
 var textWaiting = false;
-var debugHidden = false;
 
 function preload() {
 	game.load.image('good', 'assets/good_snow.png');
