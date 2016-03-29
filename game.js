@@ -17,6 +17,7 @@ var hpList = [
 
 var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game', {preload: preload, create: create, update: update});
 var textWaiting = false;
+var canAttack = false;
 
 function preload() {
 	game.load.image('good', 'assets/good_snow.png');
@@ -31,9 +32,6 @@ function preload() {
 
 
 function create() {
-
-	//replace soon
-	function doStart() {updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {moveEnemy(enemy)});};
 
 	//game setup stuff
 	game.stage.backgroundColor = "#FFFFFF";
@@ -55,14 +53,16 @@ function create() {
 	//hp
 	var playerHP = game.add.text(300, 375, player.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
 	var enemyHP = game.add.text(200, 25, enemy.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
-	//delay
-	var delay = 20;
 	//introduction
 	//replace soon
-	doStart();
+	updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {moveEnemy(enemy, function(){canAttack = true})});
 	//button commands
-	attack.events.onInputDown.add(function(){doAttack(player, enemy, messageBox, function(){movePlayer(player)}, [player, enemy, playerHP, enemyHP])}, this);
-	heal.events.onInputDown.add(function(){doHeal(player, messageBox, null, [player, enemy, playerHP, enemyHP])}, this);
+	attack.events.onInputDown.add(function(){if (canAttack) {
+		doAttack(player, enemy, messageBox, function(){movePlayer(player, function () {shakeObject(enemy, function(){enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])},
+			[player, enemy, playerHP, enemyHP])})})
+	}}, this);
+	heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, shakeObject(player), [player, enemy, playerHP, enemyHP])}}, this);
+	//run.events.onInputDown.add(function() {enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])});
 	run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
 	quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
 	//debug stuff
@@ -71,16 +71,17 @@ function create() {
 }
 
 function doAttack (self, target, messageBox, callback, chbArgs) {
+	canAttack = false;
 	//if you have the time, make it do defense too
 	icallback = null;
 	icallback = callback || function(){return null;};
 	var damage = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.attack);
 	target.stats.health = target.stats.health - damage;
-	console.log(chbArgs);
 	calculateHealthBars.apply(this, chbArgs);
 	updateText(self.stats.name + ' attacks for ' + damage + ' damage.', messageBox, icallback);
 }
 function doHeal (self, messageBox, callback, chbArgs) {
+	canAttack = false;
 	icallback = null;
 	icallback = callback || function(){return null;};
 	var heal = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.heal);
@@ -101,16 +102,41 @@ function calculateHealthBars(player, enemy, playerHP, enemyHP) {
 	else {enemyHP.text = enemy.stats.name + ' ' + hpList[enemyHealthRounded]};
 
 }
+function enemyTurn (enemy, player, messageBox, chbArgs) {
+	var choices = ['attack', 'attack', 'attack', 'heal'];
+	action = choices[Math.floor(Math.random() * choices.length)];
+	if (action === 'attack') {
+		doAttack(enemy, player, messageBox, function(){moveEnemy(enemy);canAttack = true}, chbArgs);
+	} else if (action === 'heal') {;
+		doHeal(enemy, messageBox, function(){moveEnemy(enemy);canAttack = true}, chbArgs)
+	}
+}
 function update() {
 }
 
-function movePlayer(player) {
-	game.add.tween(player).to({y: player.position.y - 100}, 750, Phaser.Easing.Bounce.Out, true)
-		.onComplete.add(function () {game.add.tween(player).to({y: 183}, 750, Phaser.Easing.Bounce.Out, true)}, this);
+function shakeObject(target, callback) {
+	var originalPosition = target.position.x;
+	icallback = null;
+	icallback = callback || function(){return null;};
+	game.add.tween(target).to({x: originalPosition - 100}, 250, Phaser.Easing.Bounce.Out, true)
+		.onComplete.add(function () {game.add.tween(target).to({x: originalPosition + 100}, 250, Phaser.Easing.Bounce.Out, true)
+		.onComplete.add(function () {game.add.tween(target).to({x: originalPosition}, 250, Phaser.Easing.Bounce.Out, true)
+		.onComplete.add(icallback, this)})}, this);
 }
-function moveEnemy(enemy) {
+
+function movePlayer(player, callback) {
+	icallback = null;
+	icallback = callback || function(){return null;};
+	game.add.tween(player).to({y: player.position.y - 100}, 750, Phaser.Easing.Bounce.Out, true)
+		.onComplete.add(function () {game.add.tween(player).to({y: 183}, 750, Phaser.Easing.Bounce.Out, true)
+		.onComplete.add(icallback, this)}, this)
+}
+function moveEnemy(enemy, callback) {
+	icallback = null;
+	icallback = callback || function(){return null;};
 	game.add.tween(enemy).to({y: enemy.position.y + 100}, 750, Phaser.Easing.Bounce.Out, true)
-		.onComplete.add(function () {game.add.tween(enemy).to({y: 25}, 750, Phaser.Easing.Bounce.Out, true);appendDebug('enemy moved');}, this);
+		.onComplete.add(function () {game.add.tween(enemy).to({y: 25}, 750, Phaser.Easing.Bounce.Out, true)
+		.onComplete.add(icallback, this)}, this);
 }
 function updateText(input, textArea, callback, resetText) {
 	//don't touch the bullshit
