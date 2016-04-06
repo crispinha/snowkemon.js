@@ -57,11 +57,12 @@ function create() {
 	//replace soon
 	updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {moveEnemy(enemy, function(){canAttack = true})});
 	//button commands
+	//attack -> movePlayer -> shakeEnemy -> enemyTurn
 	attack.events.onInputDown.add(function(){if (canAttack) {
-		doAttack(player, enemy, messageBox, function(){movePlayer(player, function () {shakeObject(enemy, function(){enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])},
-			[player, enemy, playerHP, enemyHP])})})
-	}}, this);
-	heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, shakeObject(player), [player, enemy, playerHP, enemyHP])}}, this);
+
+	}
+	}, this);
+	heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, [player, enemy, playerHP, enemyHP], function () {shakeObject(player, function() {enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])})} )}}, this);
 	//run.events.onInputDown.add(function() {enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])});
 	run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
 	quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
@@ -70,9 +71,10 @@ function create() {
 
 }
 
-function doAttack (self, target, messageBox, callback, chbArgs) {
+function doAttack (self, target, messageBox, chbArgs, callback) {
 	canAttack = false;
 	//if you have the time, make it do defense too
+	chbArgs.push('attack ' + self.stats.name)
 	icallback = null;
 	icallback = callback || function(){return null;};
 	var damage = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.attack);
@@ -80,8 +82,9 @@ function doAttack (self, target, messageBox, callback, chbArgs) {
 	calculateHealthBars.apply(this, chbArgs);
 	updateText(self.stats.name + ' attacks for ' + damage + ' damage.', messageBox, icallback);
 }
-function doHeal (self, messageBox, callback, chbArgs) {
+function doHeal (self, messageBox, chbArgs, callback) {
 	canAttack = false;
+	chbArgs.push('defend ' + self.stats.name)
 	icallback = null;
 	icallback = callback || function(){return null;};
 	var heal = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.heal);
@@ -90,9 +93,10 @@ function doHeal (self, messageBox, callback, chbArgs) {
 	updateText(self.stats.name + ' heals ' + heal + ' hp.', messageBox, icallback);
 }
 
-function calculateHealthBars(player, enemy, playerHP, enemyHP) {
+function calculateHealthBars(player, enemy, playerHP, enemyHP, message) {
 	playerHealthRounded = (player.stats.health / 10).toFixed(0);
 	enemyHealthRounded = (enemy.stats.health / 10).toFixed(0);
+	console.log(message)
 	//if health is equal to or greater than max health, use full bar, else if health is equal to or less than 0 use dead bar, else use rounded bar
 	if (player.stats.health >= player.stats.maxHealth) {playerHP.text = player.stats.name + ' ' + hpList[10]}
 	else if (player.stats.health <= 0) {playerHP.text = player.stats.name + ' ' + hpList[0]}
@@ -102,14 +106,17 @@ function calculateHealthBars(player, enemy, playerHP, enemyHP) {
 	else {enemyHP.text = enemy.stats.name + ' ' + hpList[enemyHealthRounded]};
 
 }
-function enemyTurn (enemy, player, messageBox, chbArgs) {
+function enemyTurn (enemy, player, messageBox, chbArgs, callback) {
+	icallback = null;
+	icallback = callback || function(){return null;};
 	var choices = ['attack', 'attack', 'attack', 'heal'];
 	action = choices[Math.floor(Math.random() * choices.length)];
 	if (action === 'attack') {
-		doAttack(enemy, player, messageBox, function(){moveEnemy(enemy);canAttack = true}, chbArgs);
+		doAttack(enemy, player, messageBox, chbArgs, function(){moveEnemy(enemy);canAttack = true});
 	} else if (action === 'heal') {;
-		doHeal(enemy, messageBox, function(){moveEnemy(enemy);canAttack = true}, chbArgs)
+		doHeal(enemy, messageBox, function(){shakeObject(enemy);canAttack = true}, chbArgs)
 	}
+	icallback;
 }
 function update() {
 }
