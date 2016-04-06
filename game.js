@@ -58,10 +58,10 @@ function create() {
 	updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {moveEnemy(enemy, function(){canAttack = true})});
 	//button commands
 	//attack -> movePlayer -> shakeEnemy -> enemyTurn
-	attack.events.onInputDown.add(function(){if (canAttack) {
-
-	}
-	}, this);
+	//attack.events.onInputDown.add(function(){if (canAttack) {
+	//
+	//}
+	//}, this);
 	heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, [player, enemy, playerHP, enemyHP], function () {shakeObject(player, function() {enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])})} )}}, this);
 	//run.events.onInputDown.add(function() {enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])});
 	run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
