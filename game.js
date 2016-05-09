@@ -1,6 +1,8 @@
 /**
  * Created by crispin on 23/03/16.
  */
+//use this somewhere
+// game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true)
 var hpList = [
 	'<░░░DEAD░░░>',
 	'<░░░░░░░░░░>',
@@ -14,7 +16,7 @@ var hpList = [
 	'<▓▓▓▓▓▓▓▓▓░>',
 	'<▓▓▓▓▓▓▓▓▓▓>'
 ];
-
+var testStupidLoops = 0;
 var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game', {preload: preload, create: create, update: update});
 var textWaiting = false;
 var canAttack = false;
@@ -32,7 +34,7 @@ function preload() {
 
 
 function create() {
-
+	game.camera.onShakeComplete.add(function(){console.log(testStupidLoops);testStupidLoops++;canAttack = true}, this)
 	//game setup stuff
 	game.stage.backgroundColor = "#FFFFFF";
 	var textArea = game.add.sprite(150, 435, 'box');
@@ -55,21 +57,20 @@ function create() {
 	var enemyHP = game.add.text(200, 25, enemy.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
 	//introduction
 	//replace soon
-	updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {moveEnemy(enemy, function(){canAttack = true})});
+	//updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {canAttack = true});
+	//TODO replace
+	canAttack = true;
 	//button commands
 	//attack -> movePlayer -> shakeEnemy -> enemyTurn
 	attack.events.onInputDown.add(function(){if (canAttack) {
 	doAttack(player, enemy, messageBox, [player, enemy, playerHP, enemyHP], function(){
-		movePlayer(player, function() {
-			shakeObject(enemy, function() {
-				console.log('yer mam')
-			})
-		})
+		 game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true);
+		//game.camera.onShakeComplete.add(function(){console.log(testStupidLoops);testStupidLoops++;canAttack = true}, this)
 	})
 	}});
 
-	//}, this);
-	heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, [player, enemy, playerHP, enemyHP], function () {shakeObject(player, function() {enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])})} )}}, this);
+	//enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])
+	heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, [player, enemy, playerHP, enemyHP], function () {game.camera.shake(0.02, 175, true, Phaser.Camera.SHAKE_VERTICAL, true)} )}}, this);
 	//run.events.onInputDown.add(function() {enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])});
 	run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
 	quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
@@ -81,7 +82,7 @@ function create() {
 function doAttack (self, target, messageBox, chbArgs, callback) {
 	canAttack = false;
 	//if you have the time, make it do defense too
-	chbArgs.push('attack ' + self.stats.name)
+	chbArgs.push('attack ' + self.stats.name);
 	icallback = null;
 	icallback = callback || function(){return null;};
 	var damage = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.attack);
@@ -91,7 +92,7 @@ function doAttack (self, target, messageBox, chbArgs, callback) {
 }
 function doHeal (self, messageBox, chbArgs, callback) {
 	canAttack = false;
-	chbArgs.push('defend ' + self.stats.name)
+	chbArgs.push('defend ' + self.stats.name);
 	icallback = null;
 	icallback = callback || function(){return null;};
 	var heal = Math.floor(getRandomFloat(0.7, 1.3) * self.stats.heal);
@@ -119,39 +120,39 @@ function enemyTurn (enemy, player, messageBox, chbArgs, callback) {
 	var choices = ['attack', 'attack', 'attack', 'heal'];
 	action = choices[Math.floor(Math.random() * choices.length)];
 	if (action === 'attack') {
-		doAttack(enemy, player, messageBox, chbArgs, function(){moveEnemy(enemy);canAttack = true});
-	} else if (action === 'heal') {;
-		doHeal(enemy, messageBox, function(){shakeObject(enemy);canAttack = true}, chbArgs)
+		doAttack(enemy, player, messageBox, chbArgs, function(){canAttack = true});
+	} else if (action === 'heal') {
+		doHeal(enemy, messageBox, function(){game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true);canAttack = true}, chbArgs)
 	}
 	icallback;
 }
 function update() {
 }
 
-function shakeObject(target, callback) {
-	var originalPosition = target.position.x;
-	icallback = null;
-	icallback = callback || function(){return null;};
-	game.add.tween(target).to({x: originalPosition - 100}, 250, Phaser.Easing.Bounce.Out, true)
-		.onComplete.add(function () {game.add.tween(target).to({x: originalPosition + 100}, 250, Phaser.Easing.Bounce.Out, true)
-		.onComplete.add(function () {game.add.tween(target).to({x: originalPosition}, 250, Phaser.Easing.Bounce.Out, true)
-		.onComplete.add(icallback, this)})}, this);
-}
-
-function movePlayer(player, callback) {
-	icallback = null;
-	icallback = callback || function(){return null;};
-	game.add.tween(player).to({y: player.position.y - 100}, 750, Phaser.Easing.Bounce.Out, true)
-		.onComplete.add(function () {game.add.tween(player).to({y: 183}, 750, Phaser.Easing.Bounce.Out, true)
-		.onComplete.add(icallback, this)}, this)
-}
-function moveEnemy(enemy, callback) {
-	icallback = null;
-	icallback = callback || function(){return null;};
-	game.add.tween(enemy).to({y: enemy.position.y + 100}, 750, Phaser.Easing.Bounce.Out, true)
-		.onComplete.add(function () {game.add.tween(enemy).to({y: 25}, 750, Phaser.Easing.Bounce.Out, true)
-		.onComplete.add(icallback, this)}, this);
-}
+//function shakeObject(target, callback) {
+//	var originalPosition = target.position.x;
+//	icallback = null;
+//	icallback = callback || function(){return null;};
+//	game.add.tween(target).to({x: originalPosition - 100}, 250, Phaser.Easing.Bounce.Out, true)
+//		.onComplete.add(function () {game.add.tween(target).to({x: originalPosition + 100}, 250, Phaser.Easing.Bounce.Out, true)
+//		.onComplete.add(function () {game.add.tween(target).to({x: originalPosition}, 250, Phaser.Easing.Bounce.Out, true)
+//		.onComplete.add(icallback, this)})}, this);
+//}
+//
+//function movePlayer(player, callback) {
+//	icallback = null;
+//	icallback = callback || function(){return null;};
+//	game.add.tween(player).to({y: player.position.y - 100}, 750, Phaser.Easing.Bounce.Out, true)
+//		.onComplete.add(function () {game.add.tween(player).to({y: 183}, 750, Phaser.Easing.Bounce.Out, true)
+//		.onComplete.add(icallback, this)}, this)
+//}
+//function moveEnemy(enemy, callback) {
+//	icallback = null;
+//	icallback = callback || function(){return null;};
+//	game.add.tween(enemy).to({y: enemy.position.y + 100}, 750, Phaser.Easing.Bounce.Out, true)
+//		.onComplete.add(function () {game.add.tween(enemy).to({y: 25}, 750, Phaser.Easing.Bounce.Out, true)
+//		.onComplete.add(icallback, this)}, this);
+//}
 function updateText(input, textArea, callback, resetText) {
 	//don't touch the bullshit
 	//also this has to be implicitly declared or shit hits the fan
