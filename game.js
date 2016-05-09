@@ -34,7 +34,6 @@ function preload() {
 
 
 function create() {
-	game.camera.onShakeComplete.add(function(){console.log(testStupidLoops);testStupidLoops++;canAttack = true}, this)
 	//game setup stuff
 	game.stage.backgroundColor = "#FFFFFF";
 	var textArea = game.add.sprite(150, 435, 'box');
@@ -64,8 +63,9 @@ function create() {
 	//attack -> movePlayer -> shakeEnemy -> enemyTurn
 	attack.events.onInputDown.add(function(){if (canAttack) {
 	doAttack(player, enemy, messageBox, [player, enemy, playerHP, enemyHP], function(){
-		 game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true);
-		//game.camera.onShakeComplete.add(function(){console.log(testStupidLoops);testStupidLoops++;canAttack = true}, this)
+		game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true);
+		game.camera.onShakeComplete.removeAll();
+		game.camera.onShakeComplete.addOnce(function(){console.log(testStupidLoops);testStupidLoops++;canAttack = true}, this)
 	})
 	}});
 
