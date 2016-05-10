@@ -63,9 +63,10 @@ function create() {
 	//attack -> movePlayer -> shakeEnemy -> enemyTurn
 	attack.events.onInputDown.add(function(){if (canAttack) {
 	doAttack(player, enemy, messageBox, [player, enemy, playerHP, enemyHP], function(){
-		game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true);
+		game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_BOTH, true);
 		game.camera.onShakeComplete.removeAll();
-		game.camera.onShakeComplete.addOnce(function(){console.log(testStupidLoops);testStupidLoops++;canAttack = true}, this)
+		game.camera.onShakeComplete.addOnce(function(){console.log(testStupidLoops);testStupidLoops++;}, this)
+		game.camera.onShakeComplete.addOnce(function(){enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])})
 	})
 	}});
 
@@ -120,7 +121,7 @@ function enemyTurn (enemy, player, messageBox, chbArgs, callback) {
 	var choices = ['attack', 'attack', 'attack', 'heal'];
 	action = choices[Math.floor(Math.random() * choices.length)];
 	if (action === 'attack') {
-		doAttack(enemy, player, messageBox, chbArgs, function(){canAttack = true});
+		doAttack(enemy, player, messageBox, chbArgs, function(){game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_BOTH, true);canAttack = true});
 	} else if (action === 'heal') {
 		doHeal(enemy, messageBox, function(){game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true);canAttack = true}, chbArgs)
 	}
@@ -129,30 +130,30 @@ function enemyTurn (enemy, player, messageBox, chbArgs, callback) {
 function update() {
 }
 
-//function shakeObject(target, callback) {
-//	var originalPosition = target.position.x;
-//	icallback = null;
-//	icallback = callback || function(){return null;};
-//	game.add.tween(target).to({x: originalPosition - 100}, 250, Phaser.Easing.Bounce.Out, true)
-//		.onComplete.add(function () {game.add.tween(target).to({x: originalPosition + 100}, 250, Phaser.Easing.Bounce.Out, true)
-//		.onComplete.add(function () {game.add.tween(target).to({x: originalPosition}, 250, Phaser.Easing.Bounce.Out, true)
-//		.onComplete.add(icallback, this)})}, this);
-//}
-//
-//function movePlayer(player, callback) {
-//	icallback = null;
-//	icallback = callback || function(){return null;};
-//	game.add.tween(player).to({y: player.position.y - 100}, 750, Phaser.Easing.Bounce.Out, true)
-//		.onComplete.add(function () {game.add.tween(player).to({y: 183}, 750, Phaser.Easing.Bounce.Out, true)
-//		.onComplete.add(icallback, this)}, this)
-//}
-//function moveEnemy(enemy, callback) {
-//	icallback = null;
-//	icallback = callback || function(){return null;};
-//	game.add.tween(enemy).to({y: enemy.position.y + 100}, 750, Phaser.Easing.Bounce.Out, true)
-//		.onComplete.add(function () {game.add.tween(enemy).to({y: 25}, 750, Phaser.Easing.Bounce.Out, true)
-//		.onComplete.add(icallback, this)}, this);
-//}
+function shakeObject(target, callback) {
+	var originalPosition = target.position.x;
+	icallback = null;
+	icallback = callback || function(){return null;};
+	game.add.tween(target).to({x: originalPosition - 100}, 250, Phaser.Easing.Bounce.Out, true)
+		.onComplete.addOnce(function () {game.add.tween(target).to({x: originalPosition + 100}, 250, Phaser.Easing.Bounce.Out, true)
+		.onComplete.addOnce(function () {game.add.tween(target).to({x: originalPosition}, 250, Phaser.Easing.Bounce.Out, true)
+		.onComplete.addOnce(icallback, this)})}, this);
+}
+
+function movePlayer(player, callback) {
+	icallback = null;
+	icallback = callback || function(){return null;};
+	game.add.tween(player).to({y: player.position.y - 100}, 750, Phaser.Easing.Bounce.Out, true)
+		.onComplete.addOnce(function () {game.add.tween(player).to({y: 183}, 750, Phaser.Easing.Bounce.Out, true)
+		.onComplete.add(icallback, this)}, this)
+}
+function moveEnemy(enemy, callback) {
+	icallback = null;
+	icallback = callback || function(){return null;};
+	game.add.tween(enemy).to({y: enemy.position.y + 100}, 750, Phaser.Easing.Bounce.Out, true)
+		.onComplete.addOnce(function () {game.add.tween(enemy).to({y: 25}, 750, Phaser.Easing.Bounce.Out, true)
+		.onComplete.addOnce(icallback, this)}, this);
+}
 function updateText(input, textArea, callback, resetText) {
 	//don't touch the bullshit
 	//also this has to be implicitly declared or shit hits the fan
