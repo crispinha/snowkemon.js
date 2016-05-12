@@ -57,14 +57,12 @@ function create() {
 	//introduction
 	//replace soon
 	updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {canAttack = true});
-	//button commandsn
+	//button commands
 	attack.events.onInputDown.add(function(){if (canAttack) {
 	doAttack(player, enemy, messageBox, [player, enemy, playerHP, enemyHP, messageBox], function(){
 		movePlayer(player, function () {enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP, messageBox])});
 	})
 	}});
-
-	//enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP])
 	heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, [player, enemy, playerHP, enemyHP, messageBox], function () {game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true); game.camera.onShakeComplete.addOnce(function(){enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP, messageBox])} )} )}}, this);
 	run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
 	quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
@@ -101,15 +99,13 @@ function calculateHealthBars(player, enemy, playerHP, enemyHP, messageBox) {
 	enemyHealthRounded = (enemy.stats.health / 10).toFixed(0);
 	if (enemy.stats.health <= 0) {canAttack = false; updateText('Well Done!\nYou Win!\nPlay Again?', messageBox)};
 	if (player.stats.health <= 0) {canAttack = false; updateText('Well Done!\nYou Lose!\nPlay Again?', messageBox)};
-	playerHP.text = player.stats.name + ' ' + player.stats.health;
-	enemyHP.text = enemy.stats.name + ' ' + enemy.stats.health;
 	//if health is equal to or greater than max health, use full bar, else if health is equal to or less than 0 use dead bar, else use rounded bar
-	//if (player.stats.health >= player.stats.maxHealth) {playerHP.text = player.stats.name + ' ' + hpList[10]}
-	//else if (player.stats.health <= 0) {playerHP.text = player.stats.name + ' ' + hpList[0]}
-	//else{playerHP.text = player.stats.name + ' ' + hpList[playerHealthRounded]};
-	//if (enemy.stats.health >= enemy.stats.maxHealth) {enemyHP.text = enemy.stats.name + ' ' + hpList[10]}
-	//else if (enemy.stats.health <= 0) {enemyHP.text = enemy.stats.name + ' ' + hpList[0]}
-	//else {enemyHP.text = enemy.stats.name + ' ' + hpList[enemyHealthRounded]};
+	if (player.stats.health >= player.stats.maxHealth) {playerHP.text = player.stats.name + ' ' + hpList[10]}
+	else if (player.stats.health <= 0) {playerHP.text = player.stats.name + ' ' + hpList[0]}
+	else{playerHP.text = player.stats.name + ' ' + hpList[playerHealthRounded]};
+	if (enemy.stats.health >= enemy.stats.maxHealth) {enemyHP.text = enemy.stats.name + ' ' + hpList[10]}
+	else if (enemy.stats.health <= 0) {enemyHP.text = enemy.stats.name + ' ' + hpList[0]}
+	else {enemyHP.text = enemy.stats.name + ' ' + hpList[enemyHealthRounded]};
 
 }
 function enemyTurn (enemy, player, messageBox, chbArgs, callback) {
@@ -123,7 +119,6 @@ function enemyTurn (enemy, player, messageBox, chbArgs, callback) {
 		console.log('heal');
 		doHeal(enemy, messageBox, chbArgs, function(){game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true); game.camera.onShakeComplete.addOnce(function(){canAttack = true;icallback}, true )})
 	}
-	//icallback;
 }
 function update() {
 }
