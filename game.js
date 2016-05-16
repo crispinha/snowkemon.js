@@ -17,59 +17,80 @@ var hpList = [
 	'<▓▓▓▓▓▓▓▓▓▓>'
 ];
 var testStupidLoops = 0;
-var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game', {preload: preload, create: create, update: update});
+//, {preload: preload, create: create, update: update}
+var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game');
 var textWaiting = false;
 var canAttack = false;
 
-function preload() {
-	game.load.image('good', 'assets/good_snow.png');
-	game.load.image('bad', 'assets/bad_snow.png');
-	game.load.image('box', 'assets/text_box.png');
-	game.load.image('attack', 'assets/buttons/atk.png');
-	game.load.image('heal', 'assets/buttons/fix.png');
-	game.load.image('run', 'assets/buttons/run.png');
-	game.load.image('quit', 'assets/buttons/qut.png');
-	game.load.image('snow', 'assets/buttons/snw.png');
+
+var loadState = {
+	preload: function () {
+		game.load.image('good', 'assets/good_snow.png');
+		game.load.image('bad', 'assets/bad_snow.png');
+		game.load.image('box', 'assets/text_box.png');
+		game.load.image('attack', 'assets/buttons/atk.png');
+		game.load.image('heal', 'assets/buttons/fix.png');
+		game.load.image('run', 'assets/buttons/run.png');
+		game.load.image('quit', 'assets/buttons/qut.png');
+		game.load.image('snow', 'assets/buttons/snw.png');
+		game.load.image('go', 'assets/buttons/go.png');
+		game.load.image('banner', 'brand/banner.png');
+	},
+	create: function () {
+		game.state.start('menu');
+	}
+}
+var menuState = {
+	create: function () {
+		game.stage.backgroundColor = "#FFFFFF";
+		var banner = game.add.sprite(200, 200, 'banner');
+		var button = game.add.sprite(400, 400, 'go');
+		button.inputEnabled = true;
+		button.events.onInputDown.add(function () {game.state.start('game')})
+	}
 }
 
-
-function create() {
-	//game setup stuff
-	game.stage.backgroundColor = "#FFFFFF";
-	var textArea = game.add.sprite(150, 435, 'box');
-	var messageBox = game.add.text(165, 450, "", {font: 'VT323',fontSize:'42px', fill:"#000"});
-	var attack = game.add.sprite(40, 450, 'attack');
-	var heal = game.add.sprite(40, 675, 'heal');
-	var run = game.add.sprite(900, 450, 'run');
-	var quit = game.add.sprite(900, 675, 'quit');
-	attack.inputEnabled = true;
-	heal.inputEnabled = true;
-	quit.inputEnabled = true;
-	run.inputEnabled = true;
-	//characters
-	var player = game.add.sprite(79, 183, 'good');
-	player.stats = {name: 'Pikasnow', health: 100, maxHealth: 100, attack: 7, defense: 5, heal: 3, speed: 8};
-	var enemy = game.add.sprite(675, 25, 'bad');
-	enemy.stats = {name: 'Pr.Snowk', health: 100, maxHealth: 100, attack: 4, defense: 8, heal: 6, speed: 5};
-	//hp
-	var playerHP = game.add.text(300, 375, player.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
-	var enemyHP = game.add.text(200, 25, enemy.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
-	//introduction
-	//replace soon
-	updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {canAttack = true});
-	//button commands
-	attack.events.onInputDown.add(function(){if (canAttack) {
-	doAttack(player, enemy, messageBox, [player, enemy, playerHP, enemyHP, messageBox], function(){
-		movePlayer(player, function () {enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP, messageBox])});
-	})
-	}});
-	heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, [player, enemy, playerHP, enemyHP, messageBox], function () {game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true); game.camera.onShakeComplete.addOnce(function(){enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP, messageBox])} )} )}}, this);
-	run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
-	quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
-	//debug stuff
-	appendDebug('debug activated');
-
-}
+var gameState = {
+	create: function () {	//game setup stuff
+		var textArea = game.add.sprite(150, 435, 'box');
+		var messageBox = game.add.text(165, 450, "", {font: 'VT323',fontSize:'42px', fill:"#000"});
+		var attack = game.add.sprite(40, 450, 'attack');
+		var heal = game.add.sprite(40, 675, 'heal');
+		var run = game.add.sprite(900, 450, 'run');
+		var quit = game.add.sprite(900, 675, 'quit');
+		attack.inputEnabled = true;
+		heal.inputEnabled = true;
+		quit.inputEnabled = true;
+		run.inputEnabled = true;
+		//characters
+		var player = game.add.sprite(79, 183, 'good');
+		player.stats = {name: 'Pikasnow', health: 100, maxHealth: 100, attack: 7, defense: 5, heal: 3, speed: 8};
+		var enemy = game.add.sprite(675, 25, 'bad');
+		enemy.stats = {name: 'Pr.Snowk', health: 100, maxHealth: 100, attack: 4, defense: 8, heal: 6, speed: 5};
+		//hp
+		var playerHP = game.add.text(300, 375, player.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
+		var enemyHP = game.add.text(200, 25, enemy.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
+		//introduction
+		//replace soon
+		updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {canAttack = true});
+		//button commands
+		attack.events.onInputDown.add(function(){if (canAttack) {
+			doAttack(player, enemy, messageBox, [player, enemy, playerHP, enemyHP, messageBox], function(){
+				movePlayer(player, function () {enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP, messageBox])});
+			})
+		}});
+		heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, [player, enemy, playerHP, enemyHP, messageBox], function () {game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true); game.camera.onShakeComplete.addOnce(function(){enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP, messageBox])} )} )}}, this);
+		run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
+		//quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
+		quit.events.onInputDown.add(function(){game.state.start('menu')}, this);
+		//debug stuff
+		appendDebug('debug activated');}
+};
+game.state.add('load', loadState);
+game.state.add('menu', menuState);
+game.state.add('game', gameState);
+game.state.start('load');
+/
 
 function doAttack (self, target, messageBox, chbArgs, callback) {
 	canAttack = false;
@@ -120,8 +141,7 @@ function enemyTurn (enemy, player, messageBox, chbArgs, callback) {
 		doHeal(enemy, messageBox, chbArgs, function(){game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true); game.camera.onShakeComplete.addOnce(function(){canAttack = true;icallback}, true )})
 	}
 }
-function update() {
-}
+
 function movePlayer(player, callback) {
 	icallback = null;
 	icallback = callback || function(){return null;};
