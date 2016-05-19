@@ -46,13 +46,13 @@ var menuState = {
 		var banner = game.add.sprite(game.width / 2 - 312, game.height / 6, 'banner');
 		var button = game.add.sprite(game.width / 2 - 65, 400, 'go');
 		button.inputEnabled = true;
-		button.events.onInputDown.add(function () {game.state.start('game')})
+		button.events.onInputDown.add(function () {game.state.start('game', true)})
 	}
 };
 
 var gameState = {
 	create: function () {	//game setup stuff
-		console.log('game statery')
+		console.log('game creation');
 		var textArea = game.add.sprite(150, 435, 'box');
 		var messageBox = game.add.text(165, 450, "", {font: 'VT323',fontSize:'42px', fill:"#000"});
 		var attack = game.add.sprite(40, 450, 'attack');
@@ -66,11 +66,12 @@ var gameState = {
 		//characters
 		var player = game.add.sprite(79, 183, 'good');
 		//was 7
-		player.stats = {name: 'Pikasnow', health: 100, maxHealth: 100, attack: 1000, defense: 5, heal: 3, speed: 8};
+		player.stats = {name: 'Pikasnow', health: 100, maxHealth: 100, attack: 7, defense: 5, heal: 3, speed: 8};
 		var enemy = game.add.sprite(675, 25, 'bad');
 		//was 4
-		enemy.stats = {name: 'Pr.Snowk', health: 100, maxHealth: 100, attack: 1000, defense: 8, heal: 6, speed: 5};
+		enemy.stats = {name: 'Pr.Snowk', health: 100, maxHealth: 100, attack: 4, defense: 8, heal: 6, speed: 5};
 		//hp
+		console.log('player: ' + player.stats.health + '\nenemy: ' + enemy.stats.health);
 		var playerHP = game.add.text(300, 375, player.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
 		var enemyHP = game.add.text(200, 25, enemy.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
 		//introduction
@@ -85,8 +86,11 @@ var gameState = {
 		heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, [player, enemy, playerHP, enemyHP, messageBox], function () {game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true); game.camera.onShakeComplete.addOnce(function(){enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP, messageBox])} )} )}}, this);
 		run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
 		//quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
+		quit.events.onInputDown.add(function(){game.state.start('menu');});
 		//debug stuff
-		appendDebug('debug activated');}
+		appendDebug('debug activated');},
+	update: function () {
+	}
 };
 
 var winState = {
@@ -142,8 +146,8 @@ function doHeal (self, messageBox, chbArgs, callback) {
 function calculateHealthBars(player, enemy, playerHP, enemyHP, messageBox) {
 	playerHealthRounded = (player.stats.health / 10).toFixed(0);
 	enemyHealthRounded = (enemy.stats.health / 10).toFixed(0);
-	if (enemy.stats.health <= 0) {canAttack = false; game.state.start('win')};
-	if (player.stats.health <= 0) {canAttack = false; game.state.start('lose')};
+	if (enemy.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Win!\nPlay Again?", messageBox)};
+	if (player.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Lose!\nPlay Again?", messageBox)};
 	//if health is equal to or greater than max health, use full bar, else if health is equal to or less than 0 use dead bar, else use rounded bar
 	if (player.stats.health >= player.stats.maxHealth) {playerHP.text = player.stats.name + ' ' + hpList[10]}
 	else if (player.stats.health <= 0) {playerHP.text = player.stats.name + ' ' + hpList[0]}
