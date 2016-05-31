@@ -48,7 +48,6 @@ var menuState = {
 
 var gameState = {
 	create: function () {	//game setup stuff
-		console.log('game creation');
 		var textArea = game.add.sprite(150, 435, 'box');
 		var messageBox = game.add.text(165, 450, "", {font: 'VT323',fontSize:'42px', fill:"#000"});
 		var attack = game.add.sprite(40, 450, 'attack');
@@ -61,18 +60,16 @@ var gameState = {
 		run.inputEnabled = true;
 		//characters
 		var player = game.add.sprite(79, 183, 'good');
-		//was 7
 		player.stats = {name: 'Pikasnow', health: 100, maxHealth: 100, attack: 7, defense: 5, heal: 3, speed: 8};
 		var enemy = game.add.sprite(675, 25, 'bad');
-		//was 4
 		enemy.stats = {name: 'Pr.Snowk', health: 100, maxHealth: 100, attack: 4, defense: 8, heal: 6, speed: 5};
 		//hp
-		console.log('player: ' + player.stats.health + '\nenemy: ' + enemy.stats.health);
 		var playerHP = game.add.text(300, 375, player.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
 		var enemyHP = game.add.text(200, 25, enemy.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
 		//introduction
 		//replace soon
-		updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {canAttack = true});
+		//canAttack = true;
+		updateText('Hi! I\'m the friendly Snowkemon \nProfessor, Professor Snowk! \nAnd I\'m here to kill you!', messageBox, function() {canAttack = true});
 		//button commands
 		attack.events.onInputDown.add(function(){if (canAttack) {
 			doAttack(player, enemy, messageBox, [player, enemy, playerHP, enemyHP, messageBox], function(){
@@ -135,7 +132,6 @@ function enemyTurn (enemy, player, messageBox, chbArgs, callback) {
 	if (action === 'attack') {
 		doAttack(enemy, player, messageBox, chbArgs, function(){moveEnemy(enemy, function () {canAttack = true;icallback});});
 	} else if (action === 'heal') {
-		console.log('heal');
 		doHeal(enemy, messageBox, chbArgs, function(){game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true); game.camera.onShakeComplete.addOnce(function(){canAttack = true;icallback}, true )})
 	}
 }
