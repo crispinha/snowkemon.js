@@ -64,7 +64,7 @@ var gameState = {
 		quit.inputEnabled = true;
 		run.inputEnabled = true;
 		//characters
-		var player = game.add.sprite(79, 183, 'good');
+		var player = game.add.sprite(79, 163, 'good');
 		//was 7
 		player.stats = {name: 'Pikasnow', health: 100, maxHealth: 100, attack: 7, defense: 5, heal: 3, speed: 8};
 		var enemy = game.add.sprite(675, 25, 'bad');
@@ -149,12 +149,12 @@ function calculateHealthBars(player, enemy, playerHP, enemyHP, messageBox) {
 	if (enemy.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Win!\nPlay Again?", messageBox)};
 	if (player.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Lose!\nPlay Again?", messageBox)};
 	//if health is equal to or greater than max health, use full bar, else if health is equal to or less than 0 use dead bar, else use rounded bar
-	if (player.stats.health >= player.stats.maxHealth) {playerHP.text = player.stats.name + ' ' + hpList[10]}
-	else if (player.stats.health <= 0) {playerHP.text = player.stats.name + ' ' + hpList[0]}
-	else{playerHP.text = player.stats.name + ' ' + hpList[playerHealthRounded]};
-	if (enemy.stats.health >= enemy.stats.maxHealth) {enemyHP.text = enemy.stats.name + ' ' + hpList[10]}
-	else if (enemy.stats.health <= 0) {enemyHP.text = enemy.stats.name + ' ' + hpList[0]}
-	else {enemyHP.text = enemy.stats.name + ' ' + hpList[enemyHealthRounded]};
+	if (player.stats.health >= player.stats.maxHealth) {playerHP.text = player.stats.name + ' ' + hpList[10] + player.stats.health}
+	else if (player.stats.health <= 0) {playerHP.text = player.stats.name + ' ' + hpList[0] + player.stats.health}
+	else {playerHP.text = player.stats.name + ' ' + hpList[playerHealthRounded] + player.stats.health};
+	if (enemy.stats.health >= enemy.stats.maxHealth) {enemyHP.text = enemy.stats.name + ' ' + hpList[10] + enemy.stats.health}
+	else if (enemy.stats.health <= 0) {enemyHP.text = enemy.stats.name + ' ' + hpList[0] + enemy.stats.health}
+	else {enemyHP.text = enemy.stats.name + ' ' + hpList[enemyHealthRounded] + enemy.stats.health};
 
 }
 function enemyTurn (enemy, player, messageBox, chbArgs, callback) {
@@ -175,8 +175,8 @@ function movePlayer(player, callback) {
 	icallback = callback || function(){return null;};
 	game.add.tween(player).to({y: player.position.y - 100}, 750, Phaser.Easing.Bounce.Out, true)
 		.onComplete.addOnce(function() {game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_BOTH, true);}, true);
-		game.camera.onShakeComplete.addOnce(function () {game.add.tween(player).to({y: 183}, 750, Phaser.Easing.Bounce.Out, true)
-		.onComplete.add(icallback, this)}, this)
+		game.camera.onShakeComplete.addOnce(function () {game.add.tween(player).to({y: 163}, 750, Phaser.Easing.Bounce.Out, true)
+		.onComplete.addOnce(icallback, this)}, this);
 }
 function moveEnemy(enemy, callback) {
 	icallback = null;
