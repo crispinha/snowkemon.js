@@ -1,8 +1,6 @@
 /**
  * Created by crispin on 23/03/16.
  */
-//use this somewhere
-// game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true)
 var hpList = [
 	'<░░░░░░░░░░>',
 	'<▓░░░░░░░░░>',
@@ -16,8 +14,6 @@ var hpList = [
 	'<▓▓▓▓▓▓▓▓▓░>',
 	'<▓▓▓▓▓▓▓▓▓▓>'
 ];
-var testStupidLoops = 0;
-//, {preload: preload, create: create, update: update}
 var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game');
 var textWaiting = false;
 var canAttack = false;
@@ -52,7 +48,6 @@ var menuState = {
 
 var gameState = {
 	create: function () {	//game setup stuff
-		console.log('game creation');
 		var textArea = game.add.sprite(150, 435, 'box');
 		var messageBox = game.add.text(165, 450, "", {font: 'VT323',fontSize:'42px', fill:"#000"});
 		var attack = game.add.sprite(40, 450, 'attack');
@@ -65,18 +60,16 @@ var gameState = {
 		run.inputEnabled = true;
 		//characters
 		var player = game.add.sprite(79, 183, 'good');
-		//was 7
 		player.stats = {name: 'Pikasnow', health: 100, maxHealth: 100, attack: 7, defense: 5, heal: 3, speed: 8};
 		var enemy = game.add.sprite(675, 25, 'bad');
-		//was 4
 		enemy.stats = {name: 'Pr.Snowk', health: 100, maxHealth: 100, attack: 4, defense: 8, heal: 6, speed: 5};
 		//hp
-		console.log('player: ' + player.stats.health + '\nenemy: ' + enemy.stats.health);
 		var playerHP = game.add.text(300, 375, player.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
 		var enemyHP = game.add.text(200, 25, enemy.stats.name + ' ' + hpList[10], {font: 'VT323',fontSize:'42px', fill:"#000"});
 		//introduction
 		//replace soon
-		updateText('Hi! Welcome to the world of Snowkemon!\nI\'m Professor Snowk!', messageBox, function() {canAttack = true});
+		//canAttack = true;
+		updateText('Hi! I\'m the friendly Snowkemon \nProfessor, Professor Snowk! \nAnd I\'m here to kill you!', messageBox, function() {canAttack = true});
 		//button commands
 		attack.events.onInputDown.add(function(){if (canAttack) {
 			doAttack(player, enemy, messageBox, [player, enemy, playerHP, enemyHP, messageBox], function(){
@@ -85,44 +78,18 @@ var gameState = {
 		}});
 		heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, [player, enemy, playerHP, enemyHP, messageBox], function () {game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true); game.camera.onShakeComplete.addOnce(function(){enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP, messageBox])} )} )}}, this);
 		run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
-		//quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
-		quit.events.onInputDown.add(function(){game.state.start('menu');});
-		//debug stuff
-		appendDebug('debug activated');},
+		quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);},
 	update: function () {
 	}
 };
 
-var winState = {
-	create: function () {
-		game.stage.backgroundColor = "#FFFFFF";
-		var text = game.add.text(game.width / 2, game.height / 6, "Well Done!\nYou Win!\nPlay Again?", {font: 'VT323',fontSize:'42px', fill:"#000"});
-		text.x = game.width / 2 - text.width / 2;
-		var button = game.add.sprite(game.width / 2 - 65, 400, 'go');
-		button.inputEnabled = true;
-		button.events.onInputDown.add(function () {game.state.start('game')})
-	}
-};
-var loseState = {
-	create: function () {
-		game.stage.backgroundColor = "#FFFFFF";
-		var text = game.add.text(game.width / 2, game.height / 6, "Well Done!\nYou Lose!\nPlay Again?", {font: 'VT323',fontSize:'42px', fill:"#000"});
-		text.x = game.width / 2 - text.width / 2;
-		var button = game.add.sprite(game.width / 2 - 65, 400, 'go');
-		button.inputEnabled = true;
-		button.events.onInputDown.add(function () {game.state.start('game')})
-	}
-};
 game.state.add('load', loadState);
 game.state.add('menu', menuState);
 game.state.add('game', gameState);
-game.state.add('win', winState);
-game.state.add('lose', loseState);
 game.state.start('load');
 
 function doAttack (self, target, messageBox, chbArgs, callback) {
 	canAttack = false;
-	//if you have the time, make it do defense too
 	chbArgs.push('attack ' + self.stats.name);
 	icallback = null;
 	icallback = callback || function(){return null;};
@@ -146,8 +113,8 @@ function doHeal (self, messageBox, chbArgs, callback) {
 function calculateHealthBars(player, enemy, playerHP, enemyHP, messageBox) {
 	playerHealthRounded = (player.stats.health / 10).toFixed(0);
 	enemyHealthRounded = (enemy.stats.health / 10).toFixed(0);
-	if (enemy.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Win!\nPlay Again?", messageBox)};
-	if (player.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Lose!\nPlay Again?", messageBox)};
+	if (enemy.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Win!\nPlay Again?", messageBox); showRestartButton()};
+	if (player.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Lose!\nPlay Again?", messageBox); showRestartButton()};
 	//if health is equal to or greater than max health, use full bar, else if health is equal to or less than 0 use dead bar, else use rounded bar
 	if (player.stats.health >= player.stats.maxHealth) {playerHP.text = player.stats.name + ' ' + hpList[10]}
 	else if (player.stats.health <= 0) {playerHP.text = player.stats.name + ' ' + hpList[0]}
@@ -165,9 +132,14 @@ function enemyTurn (enemy, player, messageBox, chbArgs, callback) {
 	if (action === 'attack') {
 		doAttack(enemy, player, messageBox, chbArgs, function(){moveEnemy(enemy, function () {canAttack = true;icallback});});
 	} else if (action === 'heal') {
-		console.log('heal');
 		doHeal(enemy, messageBox, chbArgs, function(){game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true); game.camera.onShakeComplete.addOnce(function(){canAttack = true;icallback}, true )})
 	}
+}
+
+function showRestartButton() {
+	var button = game.add.sprite(game.width / 2 - 65, game.height / 2 - 110, 'go');
+	button.inputEnabled = true;
+	button.events.onInputDown.add(function () {game.state.start('game')})
 }
 
 function movePlayer(player, callback) {
