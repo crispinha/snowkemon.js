@@ -64,7 +64,7 @@ var gameState = {
 		quit.inputEnabled = true;
 		run.inputEnabled = true;
 		//characters
-		var player = game.add.sprite(79, 183, 'good');
+		var player = game.add.sprite(79, 163, 'good');
 		//was 7
 		player.stats = {name: 'Pikasnow', health: 100, maxHealth: 100, attack: 7, defense: 5, heal: 3, speed: 8};
 		var enemy = game.add.sprite(675, 25, 'bad');
@@ -175,7 +175,7 @@ function movePlayer(player, callback) {
 	icallback = callback || function(){return null;};
 	game.add.tween(player).to({y: player.position.y - 100}, 750, Phaser.Easing.Bounce.Out, true)
 		.onComplete.addOnce(function() {game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_BOTH, true);}, true);
-		game.camera.onShakeComplete.addOnce(function () {game.add.tween(player).to({y: 183}, 750, Phaser.Easing.Bounce.Out, true)
+		game.camera.onShakeComplete.addOnce(function () {game.add.tween(player).to({y: 163}, 750, Phaser.Easing.Bounce.Out, true)
 		.onComplete.addOnce(icallback, this)}, this);
 }
 function moveEnemy(enemy, callback) {
