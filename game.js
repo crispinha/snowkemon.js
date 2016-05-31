@@ -1,8 +1,6 @@
 /**
  * Created by crispin on 23/03/16.
  */
-//use this somewhere
-// game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true)
 var hpList = [
 	'<░░░░░░░░░░>',
 	'<▓░░░░░░░░░>',
@@ -16,8 +14,6 @@ var hpList = [
 	'<▓▓▓▓▓▓▓▓▓░>',
 	'<▓▓▓▓▓▓▓▓▓▓>'
 ];
-var testStupidLoops = 0;
-//, {preload: preload, create: create, update: update}
 var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game');
 var textWaiting = false;
 var canAttack = false;
@@ -85,44 +81,18 @@ var gameState = {
 		}});
 		heal.events.onInputDown.add(function(){if (canAttack) {doHeal(player, messageBox, [player, enemy, playerHP, enemyHP, messageBox], function () {game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true); game.camera.onShakeComplete.addOnce(function(){enemyTurn(enemy, player, messageBox, [player, enemy, playerHP, enemyHP, messageBox])} )} )}}, this);
 		run.events.onInputDown.add(function(){updateText('It is literally impossible for you to \nrun away.\nThere is only one fight in this \nentire game.', messageBox)});
-		//quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);
-		quit.events.onInputDown.add(function(){game.state.start('menu');});
-		//debug stuff
-		appendDebug('debug activated');},
+		quit.events.onInputDown.add(function(){updateText('If you know how to close a window in \nJavascript, let me know.\n@dvlpstrcrispin', messageBox)}, this);},
 	update: function () {
 	}
 };
 
-var winState = {
-	create: function () {
-		game.stage.backgroundColor = "#FFFFFF";
-		var text = game.add.text(game.width / 2, game.height / 6, "Well Done!\nYou Win!\nPlay Again?", {font: 'VT323',fontSize:'42px', fill:"#000"});
-		text.x = game.width / 2 - text.width / 2;
-		var button = game.add.sprite(game.width / 2 - 65, 400, 'go');
-		button.inputEnabled = true;
-		button.events.onInputDown.add(function () {game.state.start('game')})
-	}
-};
-var loseState = {
-	create: function () {
-		game.stage.backgroundColor = "#FFFFFF";
-		var text = game.add.text(game.width / 2, game.height / 6, "Well Done!\nYou Lose!\nPlay Again?", {font: 'VT323',fontSize:'42px', fill:"#000"});
-		text.x = game.width / 2 - text.width / 2;
-		var button = game.add.sprite(game.width / 2 - 65, 400, 'go');
-		button.inputEnabled = true;
-		button.events.onInputDown.add(function () {game.state.start('game')})
-	}
-};
 game.state.add('load', loadState);
 game.state.add('menu', menuState);
 game.state.add('game', gameState);
-game.state.add('win', winState);
-game.state.add('lose', loseState);
 game.state.start('load');
 
 function doAttack (self, target, messageBox, chbArgs, callback) {
 	canAttack = false;
-	//if you have the time, make it do defense too
 	chbArgs.push('attack ' + self.stats.name);
 	icallback = null;
 	icallback = callback || function(){return null;};
@@ -146,8 +116,8 @@ function doHeal (self, messageBox, chbArgs, callback) {
 function calculateHealthBars(player, enemy, playerHP, enemyHP, messageBox) {
 	playerHealthRounded = (player.stats.health / 10).toFixed(0);
 	enemyHealthRounded = (enemy.stats.health / 10).toFixed(0);
-	if (enemy.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Win!\nPlay Again?", messageBox)};
-	if (player.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Lose!\nPlay Again?", messageBox)};
+	if (enemy.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Win!\nPlay Again?", messageBox); showRestartButton()};
+	if (player.stats.health <= 0) {canAttack = false; updateText("Well Done!\nYou Lose!\nPlay Again?", messageBox); showRestartButton()};
 	//if health is equal to or greater than max health, use full bar, else if health is equal to or less than 0 use dead bar, else use rounded bar
 	if (player.stats.health >= player.stats.maxHealth) {playerHP.text = player.stats.name + ' ' + hpList[10]}
 	else if (player.stats.health <= 0) {playerHP.text = player.stats.name + ' ' + hpList[0]}
@@ -168,6 +138,12 @@ function enemyTurn (enemy, player, messageBox, chbArgs, callback) {
 		console.log('heal');
 		doHeal(enemy, messageBox, chbArgs, function(){game.camera.shake(0.02, 250, true, Phaser.Camera.SHAKE_HORIZONTAL, true); game.camera.onShakeComplete.addOnce(function(){canAttack = true;icallback}, true )})
 	}
+}
+
+function showRestartButton() {
+	var button = game.add.sprite(game.width / 2 - 65, game.height / 2 - 110, 'go');
+	button.inputEnabled = true;
+	button.events.onInputDown.add(function () {game.state.start('game')})
 }
 
 function movePlayer(player, callback) {
